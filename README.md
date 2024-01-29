@@ -14,6 +14,10 @@ This repository was created with the intention of providing developers with insi
   - [What are the different types of cookies?](#what-are-the-different-types-of-cookies)
   - [How do cookies affect the user privacy?](#how-do-cookies-affect-the-user-privacy)
   - [HTTP Cookies: Pros and Cons](#http-cookies-pros-and-cons)
+- [Web Storage](#web-storage)
+  - [What is the Session Storage Object?](#what-is-the-session-storage-object)
+  - [What is the Local Storage Object?](#what-is-the-local-storage-object)
+  - [What are Web Storage’s Built-In Interfaces?](#what-are-web-storages-built-in-interfaces)
 - [Cross-Origin Resource Sharing](#cross-origin-resource-sharing)
   - [What is Cross-Origin Resource Sharing?](#what-is-cross-origin-resource-sharing)
   - [Why is cross-origin resource sharing important?](#why-is-cross-origin-resource-sharing-important)
@@ -26,6 +30,7 @@ This repository was created with the intention of providing developers with insi
 Sources:
 
 - [AWS - What is CORS?](https://aws.amazon.com/what-is/cross-origin-resource-sharing)
+- [Web Storage Explained – How to Use localStorage and sessionStorage in JavaScript Projects](https://www.freecodecamp.org/news/web-storage-localstorage-vs-sessionstorage-in-javascript/#web-storage-vs-cookies-what-is-the-difference)
 
 # Cookies
 
@@ -94,6 +99,118 @@ HTTP cookies are a versatile and powerful tool that covers various needs. Howeve
 1. Limited in size and number: Most browsers limit browser size to 4 KB and allow no more than 150 cookies per domain.
 2. Can be deleted by users: Cookies can be deleted by users at any time directly in the browser, which can cause problems for websites that rely on them.
 3. Security/Privacy risks: Cookies can contain sensitive information about the user and pose a security risk. Additionally, cookies can be used to track and collect data on a user’s behavior, which raises privacy concerns.
+
+# Web Storage
+
+### What is the Session Storage Object?
+
+The read-only sessionStorage property accesses a session Storage object for the current origin. sessionStorage is similar to localStorage; the difference is that while data in localStorage doesn't expire, data in sessionStorage is cleared when the page session ends.
+
+- Whenever a document is loaded in a particular tab in the browser, a unique page session gets created and assigned to that particular tab. That page session is valid only for that particular tab.
+- A page session lasts as long as the tab or the browser is open, and survives over page reloads and restores.
+- Opening a page in a new tab or window creates a new session with the value of the top-level browsing context, which differs from how session cookies work.
+- Opening multiple tabs/windows with the same URL creates sessionStorage for each tab/window.
+- Duplicating a tab copies the tab's sessionStorage into the new tab.
+- Closing a tab/window ends the session and clears objects in sessionStorage.
+
+Data stored in sessionStorage is specific to the protocol of the page. In particular, data stored by a script on a site accessed with HTTP (e.g., http://example.com) is put in a different sessionStorage object from the same site accessed with HTTPS (e.g., https://example.com).
+
+The keys and the values are always in the UTF-16 string format, which uses two bytes per character. As with objects, integer keys are automatically converted to strings.
+
+### Examples
+
+1. Basic usage
+
+```JavaScript
+// Save data to sessionStorage
+sessionStorage.setItem("key", "value");
+
+// Get saved data from sessionStorage
+let data = sessionStorage.getItem("key");
+
+// Remove saved data from sessionStorage
+sessionStorage.removeItem("key");
+
+// Remove all saved data from sessionStorage
+sessionStorage.clear();
+```
+
+2. Saving text between refreshes
+
+The following example autosaves the contents of a text field, and if the browser is refreshed, restores the text field content so that no writing is lost.
+
+```JavaScript
+// Get the text field that we're going to track
+let field = document.getElementById("field");
+
+// See if we have an autosave value
+// (this will only happen if the page is accidentally refreshed)
+if (sessionStorage.getItem("autosave")) {
+  // Restore the contents of the text field
+  field.value = sessionStorage.getItem("autosave");
+}
+
+// Listen for changes in the text field
+field.addEventListener("change", () => {
+  // And save the results into the session storage object
+  sessionStorage.setItem("autosave", field.value);
+});
+```
+
+### What is the Local Storage Object?
+
+The localStorage read-only property of the window interface allows you to access a Storage object for the Document's origin; the stored data is saved across browser sessions.
+
+localStorage is similar to sessionStorage, except that while localStorage data has no expiration time, sessionStorage data gets cleared when the page session ends — that is, when the page is closed. (localStorage data for a document loaded in a "private browsing" or "incognito" session is cleared when the last "private" tab is closed.)
+
+# Description
+
+The keys and the values stored with `localStorage` are _always_ in the UTF-16 string format, which uses two bytes per character. As with objects, integer keys are automatically converted to strings.
+
+`localStorage` data is specific to the protocol of the document. In particular, for a site loaded over HTTP (e.g., http://example.com), localStorage returns a different object than `localStorage` for the corresponding site loaded over HTTPS (e.g., https://example.com).
+
+For documents loaded from file: URLs (that is, files opened in the browser directly from the user's local filesystem, rather than being served from a web server) the requirements for localStorage behavior are undefined and may vary among different browsers.
+
+In all current browsers, localStorage seems to return a different object for each file: URL. In other words, each file: URL seems to have its own unique local-storage area. But there are no guarantees about that behavior, so you shouldn't rely on it because, as mentioned above, the requirements for file: URLs remain undefined. So it's possible that browsers may change their file: URL handling for localStorage at any time. In fact some browsers have changed their handling for it over time.
+
+### Examples
+
+The following snippet accesses the current domain's local Storage object and adds a data item to it using [Storage.setItem()](https://developer.mozilla.org/en-US/docs/Web/API/Storage/setItem).
+
+```JavaScript
+localStorage.setItem("myCat", "Tom");
+```
+
+The syntax for reading the localStorage item is as follows:
+
+```JavaScript
+const cat = localStorage.getItem("myCat");
+```
+
+The syntax for removing the localStorage item is as follows:
+
+```JavaScript
+localStorage.removeItem("myCat");
+```
+
+The syntax for removing all the localStorage items is as follows:
+
+```JavaScript
+localStorage.clear();
+```
+
+### What are Web Storage’s Built-In Interfaces?
+
+The web storage built-in interfaces are the recommended tools for reading and manipulating a browser’s ` sessionStorage` and `localStorage` objects.
+
+The six (6) built-in interfaces are:
+
+- [setItem()](https://developer.mozilla.org/en-US/docs/Web/API/Storage/setItem)
+- [key()](https://developer.mozilla.org/en-US/docs/Web/API/Storage/key)
+- [getItem()](https://developer.mozilla.org/en-US/docs/Web/API/Storage/key)
+- [length](https://developer.mozilla.org/en-US/docs/Web/API/Storage/length)
+- [removeItem()](https://developer.mozilla.org/en-US/docs/Web/API/Storage/removeItem)
+- [clear()](https://developer.mozilla.org/en-US/docs/Web/API/Storage/clear)
 
 # Cross-Origin Resource Sharing
 
