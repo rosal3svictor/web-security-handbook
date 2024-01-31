@@ -26,6 +26,10 @@ This repository was created with the intention of providing developers with insi
   - [What is the difference between CORS and JSONP?](#what-is-the-difference-between-cors-and-jsonp)
   - [What are some CORS best practices?](#what-are-some-cors-best-practices)
   - [How can AWS support your CORS requirements?](#how-can-aws-support-your-cors-requirements)
+- [JWT](#jwt)
+  - [What is JWT?](#what-is-jwt)
+  - [How it works?](#how-it-works)
+  - [Why you should use JWT?](why-you-should-use-jwt)
 
 Sources:
 
@@ -356,3 +360,54 @@ Here are some AWS services with CORS support:
 
 - [Amazon Simple Storage Service (Amazon S3)](https://aws.amazon.com/s3/) is an object storage service with cost-effective storage classes for all data storage use cases. Amazon S3 lets you create a CORS configuration document with rules that identify the origins you will allow to access your S3 data, the operations (HTTP methods) you will support for each origin, and other operation-specific information. You can add up to 100 rules to the configuration.
 - [Amazon API Gateway](https://aws.amazon.com/api-gateway/) is a fully managed service that makes it easy for you to create, publish, maintain, monitor, and secure APIs at any scale. You can enable CORS for your REST APIs with one click directly in the Amazon API Gateway console.
+
+# JWT
+
+### What is JWT?
+
+JWT is jut for _authorization_ not _authentication_, they are slightly different:
+
+- With **authentication**, what you're doing is that you're taking a user and a password and authenticate them so you can see that your password is correct; it's like logging a user in.
+- With **authorization**, you're actually making sure that the user that sends requests to your server is the same user that actually logged in during the authentication process. It's authorizing that this user has access to a particular resource within the system.
+
+The way that it is ussually done is by using a _session_. So for example, you have a session id that you send down in the cookies of the browser and then, every time the client make requests, they send that session id up to the server, and the server checks its memory, it finds that user and then it does the authorization to make sure the user has access.
+
+With JWT, instead of using these cookies, it uses a Json Web Token, which is what JWT stands for, to do the authorization. Let's actually look at a graph to explain the differences:
+
+<div align="center">
+  <img src="./assets/traditional-vs-jwt-authentication-system.png" alt="Traditional User Login System"/>
+</div>
+
+First, we're gonna take a look at a more traditional user logging system that uses cookies to store the user:
+
+The firt thing that happens is:
+
+1. The user logs in from the client by _posting_ to some kind of login service with their email and password.
+2. As soon as it gets to the server, it is going to do the authentication to make sure that the user is correct.
+3. Once verified the user and confirm it is correct, is it stored inside the session, which is stored in the memory of the server, and they're going to get the unique id that corresponds with that part in memory, and the will send it back the client using a cookie so that the browser always has that session id that is sent up to the server every single time it make requests.
+
+So, for example, in the next request in the graph, the user sends a new request and they want to go to a new page in the application. That session id get sent along with the cookie that it corresponds with. At the server, is it going to be made the calculation, it's going to go into the session memory and it's going to check: Do I have something in memory that corresponds with this particular session id that was sent to me? If so, it is going to say: this is the user that corresponds with that id. Now that the application knows the user it is working with, it asks the server, is the user authorized to access this information? If they are authorized, then it sends the response back to the browser saying: Okay, everything's good. Here's the information you were looking for.
+
+The other form of authentication we have here is JWT, and it works very similar to what it was explained at the beginning.
+
+1. The user makes a request to the login service with their email and password, sending them along to the server.
+2. Instead of storing information on the server inside of the session memory, what happens, is that the server creates
+   a Json Web Token and it actually encodes, serializes and signs it with its own code **secret id** so, the server knows that if you tampered with it then it's invalid. It can actually check that based on the fact that is signed with a secret key.
+3. It takes tha JWT, and sends it back to the browser (Notice that the main difference here is that nothing is stored on the server, it doesn't store the user). The JWT has all the information about user built into it.
+4. Once in the browser, the JWT could be stored however it is desired. For example, you could do cookies storage. The important thing here is that the JWT is going to be sent in every request to the server so it know what user it is authenticating with.
+5. On the counterpart, what the server does is that, it signs that JWT with its own secret key. That procedure verifies that the token has not been changed since the time it was first signed. Because, if for example, the client changed it by modifying the user information, the server will now know and it can infer that it's invalid.
+
+But, if for example, nothing actually got tampered with and the JWT is correct; the server will deserialize it, will read the user information in it so, it'll know what exactly do with it and then it will send the response back to the client based on the authotizations granted to that user.
+
+Now, really the main difference that you're going to notice between these two is that in:
+
+- Session Version: The information about the user is stored on the server. It has to do a look up to actually find the user based on the session id.
+- JWT: The user information is stored in the actual token, which means it's store on the client. The server doesn't have to remember anything which is great, because you can use the same JWT across multiple servers that you run but without having to run into problems where one server has a certain session and the other server doesn't.
+
+### How it works?
+
+[See Video](https://drive.google.com/file/d/1aARweJOVWfRfacRZl8cKe_Qz_XtIqW4L/view?usp=drive_link)
+
+### Why you should use JWT?
+
+[See Video](https://drive.google.com/file/d/1aARweJOVWfRfacRZl8cKe_Qz_XtIqW4L/view?usp=drive_link)
